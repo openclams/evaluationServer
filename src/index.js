@@ -15,25 +15,103 @@ app.get( "/", ( req, res ) => {
 
 var status;
 var missingElements = new Boolean();
-const elementsWithoutRegionCost = new Array();
+var abstractComponentsInProject = new Array();
+var receivedComponents = new Array();
+var activeGraphComponents = new Array();
+var activeGraphAbstractComponents = new Array();
+var activeGraphCost = new Number();
+var projectCost = new Number();
+
+
+
+
+
+
 
 
 
 
 app.post('/calculate', function(request, response) {
-    let bodyJson =request.body;
-    costs = calculateFunction(bodyJson);
-    response.json({"responseData":{"architectureCost":costs, "status":status, "missingElements":missingElements,
-            "MissingCosts": elementsWithoutRegionCost}});
+    let bodyJson = request.body;
+    let activeGraph;
+    abstractComponentsInProject = [];
+
+    for(let frameKey of bodyJson.data.project.frames) {
+        activeGraph = frameKey.activeGrpah;
+    }
+    for(let component of bodyJson.data.project.components){
+        receivedComponents.push(component);
+        if(component.type == 'Pattern'){
+            abstractComponentsInProject.push(component);
+        }
+    }
+    getActiveGraphcomponents(activeGraph, bodyJson.data);
+    calculateActiveGraphCost();
+    calculateProjectCost();
+
+    console.log(activeGraphCost);
+    console.log(projectCost);
+
+    for(let entry of bodyJson.data.graphs){
+        if(entry.nodes.length != null){
+        }
+    }
+    response.json({"responseData":{ "architectureCost": projectCost,
+            "abstractComponentsInProject": abstractComponentsInProject,
+            "activeGraphCost": activeGraphCost, "abstracComponentsInActivegraph": activeGraphAbstractComponents,
+            "status": status
+            }});
     response.end("yes");
 });
 
+    function calculateActiveGraphCost(){
+        let componentIdx = new Number();
+        activeGraphCost = 0;
+        let componentCost = 0;
+    for (let activeGraphComponent of activeGraphComponents){
+        if(activeGraphComponent.type == 'Instance') {
+            componentIdx = activeGraphComponent.componentIdx;
+            componentCost = receivedComponents[componentIdx];
+            for(let attribute of componentCost.attributes){
+                if(attribute.id == 'cost'){
+                    activeGraphCost = activeGraphCost + (attribute.value.units * attribute.value.cost);
+                }
+            }
+        } else {
+            activeGraphAbstractComponents.push(activeGraphComponent);
+        }
+    }
+
+    return activeGraphCost;
+}
 
 
+function getActiveGraphcomponents(activeGraph, receivedProject){
+    activeGraphComponents = [];
+    console.log(activeGraph);
+    for(let graph of receivedProject.graphs){
+        if (graph.id == activeGraph){
+            for(let node of graph.nodes) {
+                activeGraphComponents.push(node);
+            }
+        }
+    }
+}
+
+function calculateProjectCost(){
+        for(let component of receivedComponents) {
+            if( component.type == 'Service') {
+                for(let attribute of component.attributes) {
+                    if(attribute.id == 'cost') {
+                        projectCost = projectCost + (attribute.value.units * attribute.value.cost);
+                        console.log(projectCost);
+                    }
+                }
+            }
+        }
+}
 function calculateFunction(bodyJson){
-
-
-    elementsWithoutRegionCost.length = 0;
+    abstractComponentsInProject.length = 0;
     costsum = 0;
     let costSum = 0;
     const receivedData = bodyJson;
@@ -45,14 +123,14 @@ function calculateFunction(bodyJson){
            costSum = Number(receivedData.data.typeInstances[item].selectedRegion.costValue) * Number(receivedData.data.typeInstances[item].selectedRegion.costModelValue) + costSum;
            missingElements = false;
        } else {
-           elementsWithoutRegionCost.push(receivedData.data.typeInstances[item]);
+           abstractComponentsInProject.push(receivedData.data.typeInstances[item]);
        }
-       if(elementsWithoutRegionCost.length > 0) {
+       if(abstractComponentsInProject.length > 0) {
            missingElements = true;
        }
        status = "200";
    }
-   console.log(costSum);
+   // console.log(costSum);
    return costSum;
 }
 
