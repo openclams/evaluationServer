@@ -10,7 +10,7 @@ app.use(cors());
 
 // define a route handler for the default home page
 app.get( "/", ( req, res ) => {
-    res.send( "Hello world!" );
+    res.send( "Please use http://localhost:8080/calculate" );
 } );
 
 var status;
@@ -23,18 +23,14 @@ var activeGraphCost = new Number();
 var projectCost = new Number();
 
 
-
-
-
-
-
-
-
-
 app.post('/calculate', function(request, response) {
     let bodyJson = request.body;
     let activeGraph;
     abstractComponentsInProject = [];
+    receivedComponents = [];
+    activeGraphComponents = [];
+    activeGraphAbstractComponents = [];
+
 
     for(let frameKey of bodyJson.data.project.frames) {
         activeGraph = frameKey.activeGrpah;
@@ -48,9 +44,8 @@ app.post('/calculate', function(request, response) {
     getActiveGraphcomponents(activeGraph, bodyJson.data);
     calculateActiveGraphCost();
     calculateProjectCost();
-
-    console.log(activeGraphCost);
     console.log(projectCost);
+    console.log(activeGraphCost);
 
     for(let entry of bodyJson.data.graphs){
         if(entry.nodes.length != null){
@@ -87,8 +82,6 @@ app.post('/calculate', function(request, response) {
 
 
 function getActiveGraphcomponents(activeGraph, receivedProject){
-    activeGraphComponents = [];
-    console.log(activeGraph);
     for(let graph of receivedProject.graphs){
         if (graph.id == activeGraph){
             for(let node of graph.nodes) {
@@ -99,17 +92,19 @@ function getActiveGraphcomponents(activeGraph, receivedProject){
 }
 
 function calculateProjectCost(){
+        projectCost = 0;
         for(let component of receivedComponents) {
             if( component.type == 'Service') {
                 for(let attribute of component.attributes) {
                     if(attribute.id == 'cost') {
                         projectCost = projectCost + (attribute.value.units * attribute.value.cost);
-                        console.log(projectCost);
                     }
                 }
             }
         }
 }
+
+
 function calculateFunction(bodyJson){
     abstractComponentsInProject.length = 0;
     costsum = 0;
