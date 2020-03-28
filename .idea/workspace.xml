@@ -70,7 +70,12 @@
       <workItem from="1584716167612" duration="314000" />
       <workItem from="1584792789698" duration="4748000" />
       <workItem from="1584884707628" duration="13696000" />
-      <workItem from="1584980002110" duration="2561000" />
+      <workItem from="1584980002110" duration="3424000" />
+      <workItem from="1585053529129" duration="279000" />
+      <workItem from="1585067298383" duration="601000" />
+      <workItem from="1585226628432" duration="144000" />
+      <workItem from="1585226799008" duration="3143000" />
+      <workItem from="1585396028151" duration="5767000" />
     </task>
     <servers />
   </component>
@@ -162,6 +167,10 @@
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
     <state x="509" y="343" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.1920.1200@0.0.1920.1200" timestamp="1580909015612" />
+    <state x="618" y="297" width="683" height="486" key="find.popup" timestamp="1585402475325">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="618" y="297" width="683" height="486" key="find.popup/0.0.1920.1080@0.0.1920.1080" timestamp="1585402475325" />
     <state x="625" y="285" key="run.anything.popup" timestamp="1582035067005">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>

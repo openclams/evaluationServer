@@ -38,19 +38,19 @@ app.post('/calculate', function(request, response) {
     for(let component of bodyJson.data.project.components){
         receivedComponents.push(component);
         if(component.type == 'Pattern'){
-            abstractComponentsInProject.push(component);
+            abstractComponentsInProject.push(component.id);
         }
     }
-    getActiveGraphcomponents(activeGraph, bodyJson.data);
+    getActiveGraphComponents(activeGraph, bodyJson.data);
     calculateActiveGraphCost();
     calculateProjectCost();
-    console.log(projectCost);
-    console.log(activeGraphCost);
 
     for(let entry of bodyJson.data.graphs){
         if(entry.nodes.length != null){
         }
     }
+
+
     response.json({"responseData":{ "architectureCost": projectCost,
             "abstractComponentsInProject": abstractComponentsInProject,
             "activeGraphCost": activeGraphCost, "abstracComponentsInActivegraph": activeGraphAbstractComponents,
@@ -63,17 +63,24 @@ app.post('/calculate', function(request, response) {
         let componentIdx = new Number();
         activeGraphCost = 0;
         let componentCost = 0;
+        console.log(activeGraphComponents);
     for (let activeGraphComponent of activeGraphComponents){
         if(activeGraphComponent.type == 'Instance') {
             componentIdx = activeGraphComponent.componentIdx;
             componentCost = receivedComponents[componentIdx];
             for(let attribute of componentCost.attributes){
-                if(attribute.id == 'cost'){
+                if(attribute.id == 'cost') {
+                   // console.log(attribute);
                     activeGraphCost = activeGraphCost + (attribute.value.units * attribute.value.cost);
                 }
             }
         } else {
-            activeGraphAbstractComponents.push(activeGraphComponent);
+            if (activeGraphComponent.component){
+                activeGraphAbstractComponents.push(activeGraphComponent.component.id);
+            } else {
+                // activeGraphAbstractComponents.push(activeGraphComponent);
+            }
+
         }
     }
 
@@ -81,14 +88,46 @@ app.post('/calculate', function(request, response) {
 }
 
 
-function getActiveGraphcomponents(activeGraph, receivedProject){
+function getActiveGraphComponents(activeGraph, receivedProject){
     for(let graph of receivedProject.graphs){
         if (graph.id == activeGraph){
             for(let node of graph.nodes) {
-                activeGraphComponents.push(node);
+                    if(node.type == 'Instance'){
+                        receivedConcreteComponent = receivedComponents[node.componentIdx];
+                        nodeType =  getNodeOfActiveGraph(receivedConcreteComponent);
+                        if( nodeType == 'Pattern' ){
+                            activeGraphAbstractComponents.push(receivedConcreteComponent.id)
+                        } else {
+                            activeGraphComponents.push(node);
+                        }
+                    } else {
+                        if (node.type == 'Template') {
+                            console.log('Template Found');
+                            for(let element of node.elements) {
+                                concreteComponentInTemplate = receivedComponents[element.componentIdx];
+                                nodeType = getNodeOfActiveGraph(concreteComponentInTemplate);
+                                if( nodeType == 'Pattern' ){
+                                    activeGraphAbstractComponents.push(concreteComponentInTemplate.id)
+                                } else {
+                                    activeGraphComponents.push(node);
+                                }
+                            }
+                        }
+                    }
             }
         }
     }
+}
+
+function getNodeOfActiveGraph(activeGraphComponent){
+        console.log(activeGraphComponent);
+        if(activeGraphComponent.type == 'Pattern' ) {
+            nodeType = activeGraphComponent.type;
+            return nodeType;
+        } else {
+            nodeType = activeGraphComponent.type;
+            return nodeType
+        }
 }
 
 function calculateProjectCost(){
