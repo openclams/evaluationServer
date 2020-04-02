@@ -75,7 +75,12 @@
       <workItem from="1585067298383" duration="601000" />
       <workItem from="1585226628432" duration="144000" />
       <workItem from="1585226799008" duration="3143000" />
-      <workItem from="1585396028151" duration="5767000" />
+      <workItem from="1585396028151" duration="6396000" />
+      <workItem from="1585493937857" duration="265000" />
+      <workItem from="1585575451666" duration="2746000" />
+      <workItem from="1585604755063" duration="25000" />
+      <workItem from="1585664250435" duration="1767000" />
+      <workItem from="1585830366544" duration="4941000" />
     </task>
     <servers />
   </component>
@@ -83,6 +88,10 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="423" y="99" key="CommitChangelistDialog2" timestamp="1585759581996">
+      <screen x="0" y="23" width="1680" height="952" />
+    </state>
+    <state x="423" y="99" key="CommitChangelistDialog2/0.23.1680.952@0.23.1680.952" timestamp="1585759581996" />
     <state width="1878" height="414" key="GridCell.Tab.0.bottom" timestamp="1580919869715">
       <screen x="0" y="23" width="1920" height="1097" />
     </state>

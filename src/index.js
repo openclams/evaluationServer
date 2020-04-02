@@ -31,25 +31,30 @@ app.post('/calculate', function(request, response) {
     activeGraphComponents = [];
     activeGraphAbstractComponents = [];
 
-
     for(let frameKey of bodyJson.data.project.frames) {
         activeGraph = frameKey.activeGrpah;
     }
     for(let component of bodyJson.data.project.components){
         receivedComponents.push(component);
         if(component.type == 'Pattern'){
-            abstractComponentsInProject.push(component.id);
+            for(let componentAttribute of component.attributes) {
+                if(componentAttribute.id == 'name') {
+                    abstractComponentsInProject.push(componentAttribute.value);
+                }
+            }
         }
     }
     getActiveGraphComponents(activeGraph, bodyJson.data);
     calculateActiveGraphCost();
     calculateProjectCost();
 
-    for(let entry of bodyJson.data.graphs){
-        if(entry.nodes.length != null){
-        }
+    if(abstractComponentsInProject.length == []) {
+        status = false;
+    } else {
+        status = true;
     }
 
+    console.log(status + abstractComponentsInProject);
 
     response.json({"responseData":{ "architectureCost": projectCost,
             "abstractComponentsInProject": abstractComponentsInProject,
@@ -63,7 +68,6 @@ app.post('/calculate', function(request, response) {
         let componentIdx = new Number();
         activeGraphCost = 0;
         let componentCost = 0;
-        console.log(activeGraphComponents);
     for (let activeGraphComponent of activeGraphComponents){
         if(activeGraphComponent.type == 'Instance') {
             componentIdx = activeGraphComponent.componentIdx;
@@ -88,39 +92,42 @@ app.post('/calculate', function(request, response) {
 }
 
 
+
 function getActiveGraphComponents(activeGraph, receivedProject){
     for(let graph of receivedProject.graphs){
         if (graph.id == activeGraph){
             for(let node of graph.nodes) {
-                    if(node.type == 'Instance'){
-                        receivedConcreteComponent = receivedComponents[node.componentIdx];
-                        nodeType =  getNodeOfActiveGraph(receivedConcreteComponent);
-                        if( nodeType == 'Pattern' ){
-                            activeGraphAbstractComponents.push(receivedConcreteComponent.id)
-                        } else {
-                            activeGraphComponents.push(node);
+                if(node.type == 'Instance'){
+                    receivedConcreteComponent = receivedComponents[node.componentIdx];
+                    nodeType =  getNodeOfActiveGraph(receivedConcreteComponent);
+                    if( nodeType == 'Pattern' ){
+                        for(let attribute of receivedConcreteComponent.attributes) {
+                            if(attribute.id == 'name') {
+                                activeGraphAbstractComponents.push(attribute.value);
+                            }
                         }
                     } else {
-                        if (node.type == 'Template') {
-                            console.log('Template Found');
-                            for(let element of node.elements) {
-                                concreteComponentInTemplate = receivedComponents[element.componentIdx];
-                                nodeType = getNodeOfActiveGraph(concreteComponentInTemplate);
-                                if( nodeType == 'Pattern' ){
-                                    activeGraphAbstractComponents.push(concreteComponentInTemplate.id)
-                                } else {
-                                    activeGraphComponents.push(node);
-                                }
+                        activeGraphComponents.push(node);
+                    }
+                } else {
+                    if (node.type == 'Template') {
+                        for(let element of node.elements) {
+                            concreteComponentInTemplate = receivedComponents[element.componentIdx];
+                            nodeType = getNodeOfActiveGraph(concreteComponentInTemplate);
+                            if( nodeType == 'Pattern' ){
+                                activeGraphAbstractComponents.push(concreteComponentInTemplate.id)
+                            } else {
+                                activeGraphComponents.push(node);
                             }
                         }
                     }
+                }
             }
         }
     }
 }
 
 function getNodeOfActiveGraph(activeGraphComponent){
-        console.log(activeGraphComponent);
         if(activeGraphComponent.type == 'Pattern' ) {
             nodeType = activeGraphComponent.type;
             return nodeType;
@@ -143,30 +150,6 @@ function calculateProjectCost(){
         }
 }
 
-
-function calculateFunction(bodyJson){
-    abstractComponentsInProject.length = 0;
-    costsum = 0;
-    let costSum = 0;
-    const receivedData = bodyJson;
-   for (let item in bodyJson.data.typeInstances) {
-       // console.log(bodyJson.data.typeInstances[item]);
-       const receivedItem = receivedData.data.typeInstances[item];
-       costModelCheck(receivedItem);
-       if(receivedData.data.typeInstances[item].selectedRegion != null) {
-           costSum = Number(receivedData.data.typeInstances[item].selectedRegion.costValue) * Number(receivedData.data.typeInstances[item].selectedRegion.costModelValue) + costSum;
-           missingElements = false;
-       } else {
-           abstractComponentsInProject.push(receivedData.data.typeInstances[item]);
-       }
-       if(abstractComponentsInProject.length > 0) {
-           missingElements = true;
-       }
-       status = "200";
-   }
-   // console.log(costSum);
-   return costSum;
-}
 
 /**
  * The received item from the Frontend
