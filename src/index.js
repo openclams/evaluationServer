@@ -56,9 +56,9 @@ app.post('/calculate', function(request, response) {
 
     console.log(status + abstractComponentsInProject);
 
-    response.json({"responseData":{ "architectureCost": projectCost,
-            "abstractComponentsInProject": abstractComponentsInProject,
-            "activeGraphCost": activeGraphCost, "abstracComponentsInActivegraph": activeGraphAbstractComponents,
+    response.json({"responseData":{ "projectCost": projectCost,
+            "projectAbstractComponent": abstractComponentsInProject,
+            "activeGraphCost": activeGraphCost, "activeGraphAbstractComponent": activeGraphAbstractComponents,
             "status": status
             }});
     response.end("yes");
