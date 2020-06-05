@@ -24,6 +24,7 @@ var projectCost = new Number();
 
 
 app.post('/calculate', function(request, response) {
+    console.log(request);
     let bodyJson = request.body;
     let activeGraph;
     abstractComponentsInProject = [];
